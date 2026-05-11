@@ -230,10 +230,10 @@ impl Array4 {
             let mut new_aux = None;
 
             for (slot, old_actual_val) in old_aux.into_iter() {
-                debug_assert_ne!(
+                debug_assert_eq!(
                     self.get_raw(slot),
                     AUX_TOKEN,
-                    "AuxMap contains slow without AUX_TOKEN"
+                    "AuxMap contains slot != AUX_TOKEN"
                 );
 
                 let new_shifted = old_actual_val - new_cur_min;
