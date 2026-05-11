@@ -503,4 +503,29 @@ mod tests {
             "kxq1 should be small (1/2^40 is tiny)"
         );
     }
+
+    #[test]
+    fn test_shift_cur_min_rebuilds_aux_entry() {
+        let lg_config_k = 4;
+        let num_slots = 1_u32 << lg_config_k;
+        let mut arr = Array4::new(lg_config_k);
+
+        arr.update(Coupon::pack(0, 15));
+        assert_eq!(arr.get_raw(0), AUX_TOKEN);
+        assert_eq!(arr.aux_map.as_ref().and_then(|aux| aux.get(0)), Some(15));
+
+        for slot in 1..num_slots {
+            arr.update(Coupon::pack(slot, 1));
+        }
+
+        assert_eq!(arr.cur_min, 1);
+        assert_eq!(arr.num_at_cur_min, num_slots - 1);
+        assert_eq!(arr.get_raw(0), 14);
+        assert_eq!(arr.get(0), 15);
+        assert!(arr.aux_map.is_none());
+
+        for slot in 1..num_slots {
+            assert_eq!(arr.get(slot), 1);
+        }
+    }
 }
